@@ -123,7 +123,7 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
             userDeposit.glpBalance = userGlpBalance + glpStaked.toUint128();
             roundGlpBalance += glpStaked.toUint128();
         }
-        emit DepositToken(token, receiver, amount, glpStaked);
+        emit DepositToken(currentRound, token, receiver, amount, glpStaked);
     }
 
     function executeBatchDeposit() external {
@@ -146,7 +146,7 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
             // Update round data
             roundDeposits[currentRound] = RoundDeposit(roundGlpBalance.toUint128(), totalShares.toUint128());
 
-            emit BatchDeposit(roundGlpBalance, totalShares);
+            emit BatchDeposit(currentRound, roundGlpBalance, totalShares);
 
             roundGlpBalance = 0;
             ++currentRound;
