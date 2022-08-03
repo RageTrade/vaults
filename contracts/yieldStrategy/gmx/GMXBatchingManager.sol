@@ -28,8 +28,8 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
         mapping(uint256 => RoundDeposit) roundDeposits;
     }
 
-    IERC4626[10] public vaults;
-    uint8 vaultCount;
+    IERC4626[] public vaults;
+    uint256 maxVaults;
     mapping(IERC4626 => VaultBatchingState) public vaultBatchingState;
     address public stakingManager; // used for depositing harvested rewards
     uint256 public stakingManagerGlpBalance;
@@ -54,11 +54,12 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
         IRewardRouterV2 _rewardRouter,
         IGlpManager _glpManager,
         address _stakingManager,
-        address _keeper
+        address _keeper,
+        uint256 _maxVaults
     ) external initializer {
         __Ownable_init();
         __Pausable_init();
-        __GMXBatchingManager_init(_sGlp, _rewardRouter, _glpManager, _stakingManager, _keeper);
+        __GMXBatchingManager_init(_sGlp, _rewardRouter, _glpManager, _stakingManager, _keeper, _maxVaults);
     }
 
     function __GMXBatchingManager_init(
@@ -66,7 +67,8 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
         IRewardRouterV2 _rewardRouter,
         IGlpManager _glpManager,
         address _stakingManager,
-        address _keeper
+        address _keeper,
+        uint256 _maxVaults
     ) internal onlyInitializing {
         sGlp = _sGlp;
         rewardRouter = _rewardRouter;
@@ -75,7 +77,9 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
         stakingManager = _stakingManager;
 
         keeper = _keeper;
+        maxVaults = _maxVaults;
         emit KeeperUpdated(_keeper);
+        emit MaxVaultsUpdated(_maxVaults);
     }
 
     function grantAllowances(IERC4626 gmxVault) external onlyOwner {
@@ -86,6 +90,11 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
     function setKeeper(address _keeper) external onlyOwner {
         keeper = _keeper;
         emit KeeperUpdated(_keeper);
+    }
+
+    function setMaxVaults(uint256 _maxVaults) external onlyOwner {
+        maxVaults = _maxVaults;
+        emit MaxVaultsUpdated(_maxVaults);
     }
 
     function pauseDeposit() external onlyKeeper {
@@ -225,6 +234,7 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
     ) external {
         if (receiver == address(0)) revert InvalidInput(0x10);
         if (amount == 0) revert InvalidInput(0x11);
+        if (!_isVaultValid(gmxVault)) revert InvalidInput(0x12);
 
         VaultBatchingState storage state = vaultBatchingState[gmxVault];
         UserDeposit storage userDeposit = state.userDeposits[_msgSender()];
@@ -279,11 +289,10 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
     }
 
     function addVault(IERC4626 vault) external onlyOwner {
-        if (vaultCount == vaults.length) revert VaultsLimitExceeded();
+        if (vaults.length == maxVaults) revert VaultsLimitExceeded();
         if (vaultBatchingState[vault].currentRound != 0) revert VaultAlreadyAdded();
         vaultBatchingState[vault].currentRound = 1;
-        vaults[vaultCount] = vault;
-        ++vaultCount;
+        vaults.push(vault);
     }
 
     function _isVaultValid(IERC4626 vault) internal view returns (bool) {

@@ -19,6 +19,7 @@ interface IGMXBatchingManager {
     event BatchDeposit(uint256 round, uint256 userGlpAmount, uint256 userShareAmount);
     event SharesClaimed(address from, address receiver, uint256 claimAmount);
     event KeeperUpdated(address newKeeper);
+    event MaxVaultsUpdated(uint256 maxVaults);
 
     struct UserDeposit {
         uint256 round;
