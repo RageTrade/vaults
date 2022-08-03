@@ -19,6 +19,7 @@ interface IGMXBatchingManager {
     event BatchDeposit(uint256 round, uint256 userGlpAmount, uint256 userShareAmount);
     event SharesClaimed(address from, address receiver, uint256 claimAmount);
     event KeeperUpdated(address newKeeper);
+    event MaxVaultsUpdated(uint256 maxVaults);
 
     struct UserDeposit {
         uint256 round;
@@ -48,13 +49,11 @@ interface IGMXBatchingManager {
 
     function stakingManagerGlpBalance() external view returns (uint256 balance);
 
-    function glpBalance(address account) external view returns (uint256 balance);
+    function glpBalanceAllVaults(address account) external view returns (uint256 balance);
 
-    function glpBalancePerVault(IERC4626 gmxVault, address account) external view returns (uint256 balance);
+    function glpBalance(IERC4626 gmxVault, address account) external view returns (uint256 balance);
 
-    function unclaimedShares(address account) external view returns (uint256 shares);
-
-    function unclaimedSharesPerVault(IERC4626 gmxVault, address account) external view returns (uint256 shares);
+    function unclaimedShares(IERC4626 gmxVault, address account) external view returns (uint256 shares);
 
     function claim(
         IERC4626 gmxVault,

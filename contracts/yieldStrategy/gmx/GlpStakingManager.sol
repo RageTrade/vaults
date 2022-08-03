@@ -160,7 +160,7 @@ contract GlpStakingManager is RageERC4626, OwnableUpgradeable {
 
     function _simulateBeforeWithdraw(uint256 assets)
         internal
-        view
+        pure
         override
         returns (uint256 adjustedAssets, int256 tokensToTrade)
     {

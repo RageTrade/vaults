@@ -96,6 +96,7 @@ export const gmxYieldStrategyFixture = deployments.createFixture(async hre => {
     GMX_ECOSYSTEM_ADDRESSES.GlpManager,
     glpStakingManager.address,
     signer.address,
+    10,
   );
 
   await glpStakingManager.updateGMXParams(100, 0, 500, gmxBatchingManager.address);
