@@ -39,6 +39,7 @@ export const gmxBatchingManagerFixture = deployments.createFixture(async hre => 
     gmxAddresses.GlpManager,
     stakingManager.address,
     keeper.address,
+    10,
   );
   await vault.grantAllowances();
   await stakingManager.grantAllowances();
