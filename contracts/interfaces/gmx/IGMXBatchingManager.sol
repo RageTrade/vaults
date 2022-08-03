@@ -14,10 +14,16 @@ interface IGMXBatchingManager {
     error VaultsLimitExceeded();
     error VaultAlreadyAdded();
 
-    event DepositToken(uint256 round, address token, address receiver, uint256 amount, uint256 glpStaked);
+    event DepositToken(
+        uint256 indexed round,
+        address indexed token,
+        address indexed receiver,
+        uint256 amount,
+        uint256 glpStaked
+    );
     event VaultDeposit(uint256 vaultGlpAmount);
-    event BatchDeposit(uint256 round, uint256 userGlpAmount, uint256 userShareAmount);
-    event SharesClaimed(address from, address receiver, uint256 claimAmount);
+    event BatchDeposit(uint256 indexed round, uint256 userGlpAmount, uint256 userShareAmount);
+    event SharesClaimed(address indexed from, address indexed receiver, uint256 claimAmount);
     event KeeperUpdated(address newKeeper);
 
     struct UserDeposit {

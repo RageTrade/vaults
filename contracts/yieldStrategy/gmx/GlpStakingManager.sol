@@ -27,8 +27,8 @@ contract GlpStakingManager is RageERC4626, OwnableUpgradeable {
     event GmxParamsUpdated(uint256 newFee, address batchingManager);
     event VaultUpdated(address vaultAddress, bool isVault);
 
-    event TokenWithdrawn(address token, uint256 shares, address receiver);
-    event TokenRedeemded(address token, uint256 _sGLPQuantity, address receiver);
+    event TokenWithdrawn(address indexed token, uint256 shares, address indexed receiver);
+    event TokenRedeemded(address indexed token, uint256 _sGLPQuantity, address indexed receiver);
 
     /* solhint-disable var-name-mixedcase */
     uint256 public constant MAX_BPS = 10_000;
@@ -53,6 +53,8 @@ contract GlpStakingManager is RageERC4626, OwnableUpgradeable {
     IGMXBatchingManager private batchingManager;
 
     mapping(address => bool) public isVault;
+
+    error ZeroShares();
 
     struct GlpStakingManagerInitParams {
         RageERC4626InitParams rageErc4626InitParams;
@@ -160,7 +162,7 @@ contract GlpStakingManager is RageERC4626, OwnableUpgradeable {
 
     function _simulateBeforeWithdraw(uint256 assets)
         internal
-        view
+        pure
         override
         returns (uint256 adjustedAssets, int256 tokensToTrade)
     {
@@ -184,7 +186,8 @@ contract GlpStakingManager is RageERC4626, OwnableUpgradeable {
 
         uint256 assets = batchingManager.depositToken(token, amount, usdgAmount);
 
-        require((shares = previewDeposit(assets)) != 0, 'ZERO_SHARES');
+        shares = previewDeposit(assets);
+        if (shares == 0) revert ZeroShares();
 
         // // Need to transfer before minting or ERC777s could reenter.
         // asset.safeTransferFrom(msg.sender, address(this), assets);
