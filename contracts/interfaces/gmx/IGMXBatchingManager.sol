@@ -49,13 +49,11 @@ interface IGMXBatchingManager {
 
     function stakingManagerGlpBalance() external view returns (uint256 balance);
 
-    function glpBalance(address account) external view returns (uint256 balance);
+    function glpBalanceAllVaults(address account) external view returns (uint256 balance);
 
-    function glpBalancePerVault(IERC4626 gmxVault, address account) external view returns (uint256 balance);
+    function glpBalance(IERC4626 gmxVault, address account) external view returns (uint256 balance);
 
-    function unclaimedShares(address account) external view returns (uint256 shares);
-
-    function unclaimedSharesPerVault(IERC4626 gmxVault, address account) external view returns (uint256 shares);
+    function unclaimedShares(IERC4626 gmxVault, address account) external view returns (uint256 shares);
 
     function claim(
         IERC4626 gmxVault,

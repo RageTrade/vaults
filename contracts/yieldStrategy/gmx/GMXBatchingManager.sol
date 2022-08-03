@@ -207,23 +207,17 @@ contract GMXBatchingManager is IGMXBatchingManager, OwnableUpgradeable, Pausable
         }
     }
 
-    function glpBalance(address account) external view returns (uint256 balance) {
-        for (uint256 i; i < vaults.length; i++) {
-            balance += glpBalancePerVault(vaults[i], account);
-        }
-    }
-
-    function glpBalancePerVault(IERC4626 gmxVault, address account) public view returns (uint256 balance) {
+    function glpBalance(IERC4626 gmxVault, address account) public view returns (uint256 balance) {
         balance = vaultBatchingState[gmxVault].userDeposits[account].glpBalance;
     }
 
-    function unclaimedShares(address account) external view returns (uint256 shares) {
+    function glpBalanceAllVaults(address account) external view returns (uint256 balance) {
         for (uint256 i; i < vaults.length; i++) {
-            shares += unclaimedSharesPerVault(vaults[i], account);
+            balance += glpBalance(vaults[i], account);
         }
     }
 
-    function unclaimedSharesPerVault(IERC4626 gmxVault, address account) public view returns (uint256 shares) {
+    function unclaimedShares(IERC4626 gmxVault, address account) external view returns (uint256 shares) {
         shares = vaultBatchingState[gmxVault].userDeposits[account].unclaimedShares;
     }
 
